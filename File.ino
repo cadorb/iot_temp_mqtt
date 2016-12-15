@@ -1,3 +1,8 @@
+/**
+ * Created by Blaise Cador
+ * Read Write Delete Configuration File
+ */
+
 String readConf() {
     String my_ssid;
     String my_password;

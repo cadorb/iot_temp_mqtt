@@ -1,4 +1,9 @@
-void setupwebs() {
+/**
+ * Created by Blaise Cador
+ * AP Mode
+ */
+
+void initApMode() {
     delay(500);
 
     Serial.println("*** LaunchPad CC3200 WiFi Web-Server in AP Mode");
@@ -30,7 +35,7 @@ void setupwebs() {
     Serial.println();
 }
 
-void apmode() {
+void setApMode() {
     countClients = WiFi.getTotalDevices();
 
     // Did a client connect/disconnect since the last time we checked?

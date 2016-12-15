@@ -1,3 +1,9 @@
+/**
+ * Created by Blaise Cador
+ * System functions
+ * VOID
+ */
+
 void restart() {
     Serial.println("Restarting CC3200");
 
@@ -9,14 +15,5 @@ void restart() {
     sl_WlanSetMode(ROLE_STA);
     sl_Stop(0xFF);
     sl_Start(0, 0, 0);
-
-
-    String confString = readConf();
-    stationmode(confString);
-
-    while (1) {
-        listenButtons();
-        temp();
-    }
 
 }

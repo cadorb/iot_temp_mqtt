@@ -3,9 +3,13 @@
 #include "Energia.h"
 #include "string.h"
 #include "stdio.h"
+
 #ifndef __CC3200R1M1RGC__
+
 #include <SPI.h>                // Do not include SPI for CC3200 LaunchPad
+
 #endif
+
 #include <WiFi.h>
 #include <SLFS.h>
 #include "utility/udma_if.h"
@@ -26,74 +30,56 @@ uint8_t countClients = 0;
 const int buttonPin = PUSH2;
 int buttonState = 0;
 
+String confString;
+
 
 void setup() {
 
-  pinMode(buttonPin, INPUT_PULLUP);
+    initButtons();
+    initLeds();
+    shutdownLeds();
+    delay(2000);
 
-  pinMode(YELLOW_LED, OUTPUT);
-  pinMode(RED_LED, OUTPUT);
-  pinMode(GREEN_LED, OUTPUT);
+    Serial.begin(115200);
+    Serial.println("#### Mesure de temperature ####");
+    delay(500);
+    SerFlash.begin();  // This actually calls WiFi.init() btw
+    int insetup_retval = SerFlash.open(wifi_confFile, FS_MODE_OPEN_READ);
+    SerFlash.close();
 
-  digitalWrite(YELLOW_LED, LOW);
-  digitalWrite(GREEN_LED, LOW);
-  digitalWrite(RED_LED, LOW);
-
-  delay(2000);
-
-
-  // put your setup code here, to run once:
-  Serial.begin(115200);
-  Serial.println("#### Mesure de temperature ####");
-  delay(500);
-  SerFlash.begin();  // This actually calls WiFi.init() btw
-  int insetup_retval = SerFlash.open(wifi_confFile, FS_MODE_OPEN_READ);
-  SerFlash.close();
-
-
-  Serial.println("#######");
-  Serial.println(insetup_retval);
-  Serial.println("#######");
-
-  if (insetup_retval != 0) {
-    setupwebs();
-  } else {
-    String confString = readConf();
-    setuptemp();
-    digitalWrite(GREEN_LED, HIGH);
-    stationmode(confString);
-  }
+    if (insetup_retval != 0) {
+        initApMode();
+    } else {
+        confString = readConf();
+        initTemp();
+        digitalWrite(GREEN_LED, HIGH);
+        initStationMode(confString);
+    }
 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  buttonState = digitalRead(buttonPin);
+    // put your main code here, to run repeatedly:
+    buttonState = digitalRead(buttonPin);
 
-  int conf = confExists();
+    int conf = confExists();
 
-  Serial.println("#######");
-  Serial.println(conf);
-  Serial.println("#######");
+    Serial.println("#######");
+    Serial.println(conf);
+    Serial.println("#######");
 
-  if (conf != 0) {
-    while (1) {
-      digitalWrite(RED_LED, HIGH);
-      apmode();
+    if (conf != 0) {
+        while (1) {
+            digitalWrite(RED_LED, HIGH);
+            setApMode();
+        }
+    } else {
+        while (1) {
+            listenButtons();
+            blinkRedLed();
+            setStationMode();
+        }
     }
-  } else {
-    while (1) {
-      listenButtons();
-      digitalWrite(RED_LED, HIGH);   // turn the LED on (HIGH is the voltage level)
-      delay(300);               // wait for a second
-      digitalWrite(RED_LED, LOW);    // turn the LED off by making the voltage LOW
-      delay(300);               // wait for a second
-      temp();
-    }
-  }
-
-
-
 }
 
 
